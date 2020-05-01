@@ -1,0 +1,47 @@
+<launch>
+  <arg name="config" default="$(optenv RIDGEBACK_CONFIG base)" />
+  <arg name="namespace" default="/" />
+  <arg name="robot_name" default="" />
+
+  <arg name="x" default="0" />
+  <arg name="y" default="0" />
+  <arg name="z" default="0.1" />
+
+  <!-- Load Ridgeback's description, controllers, and teleop nodes. -->
+  <include file="$(find ridgeback_description)/launch/description.launch">
+    <arg name="config" value="$(arg config)" />
+    <arg name="namespace" value="$(arg namespace)" />
+    <arg name="robot_name" value="$(arg robot_name)" />
+  </include>
+  <include file="$(find ridgeback_control)/launch/control.launch">
+    <arg name="namespace" value="$(arg namespace)" />
+  </include>
+  <include file="$(find ridgeback_control)/launch/teleop.launch">
+    <arg name="joystick" value="false"/>
+    <arg name="namespace" value="$(arg namespace)" />
+  </include>
+
+  <rosparam param="/gazebo_ros_control/pid_gains">
+    front_left_wheel:
+      p: 1
+      i: 0.1
+      d: 0
+    front_right_wheel:
+      p: 1
+      i: 0.1
+      d: 0
+    rear_left_wheel:
+      p: 1
+      i: 0.1
+      d: 0
+    rear_right_wheel:
+      p: 1
+      i: 0.1
+      d: 0
+  </rosparam>
+
+  <!-- Spawn Ridgeback -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+        args="-urdf -model $(arg robot_name) -param robot_description -x $(arg x) -y $(arg y) -z $(arg z)" />
+
+</launch>
